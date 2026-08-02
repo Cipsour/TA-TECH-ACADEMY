@@ -125,7 +125,7 @@ export const Hero: React.FC<HeroProps> = ({
                   <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
                 </div>
                 <span className="text-[10px] font-mono text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/50">
-                  NEXUS_AI_ENGINE_V2.5
+                  TA_TECH_AI_ENGINE_V2.5
                 </span>
               </div>
 

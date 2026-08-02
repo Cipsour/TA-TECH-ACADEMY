@@ -172,7 +172,7 @@ export const LmsPortal: React.FC = () => {
                   <span className="text-[10px]">Python 3.12</span>
                 </div>
                 <pre className="text-xs font-mono text-emerald-400 overflow-x-auto p-2 bg-slate-950 rounded">
-{`# Bài tập Thực hành - Học viện Nexus
+{`# Bài tập Thực hành - Học viện TA TECH
 def tinh_diem_trung_binh(danh_sach_diem):
     trung_binh = sum(danh_sach_diem) / len(danh_sach_diem)
     if trung_binh >= 9.0:
@@ -248,7 +248,7 @@ print(tinh_diem_trung_binh([9.5, 9.8, 9.2]))`}
                 <div className="text-[10px] text-slate-400">Hoàn thành 100% bài học để mở khóa tải chứng nhận chính thức.</div>
                 <button
                   disabled={progressPercent < 100}
-                  onClick={() => alert("Đang tải file PDF Chứng nhận Học viện Nexus & Certiport...")}
+                  onClick={() => alert("Đang tải file PDF Chứng nhận Học viện TA TECH & Certiport...")}
                   className="w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-800 disabled:text-slate-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                 >
                   <Download className="w-3.5 h-3.5" />

@@ -67,7 +67,7 @@ async function startServer() {
 
   // Health check endpoint
   app.get("/api/health", (req, res) => {
-    res.json({ status: "ok", service: "Nexus IT & AI Academy Backend", timestamp: new Date() });
+    res.json({ status: "ok", service: "TA TECH Academy Backend", timestamp: new Date() });
   });
 
   // Get all leads (Admin CRM)
@@ -137,18 +137,18 @@ async function startServer() {
       }
 
       const ai = new GoogleGenAI({ apiKey });
-      const systemInstruction = `You are Nexus Academy's AI Academic Consultant. Your goal is to provide concise, friendly, encouraging advice for parents and students choosing IT & AI courses (IC3 Spark, MOS, Python, Scratch, Algorithms, Applied AI). Keep answers clear and actionable. Recommend specific courses based on student age/goals.`;
+      const systemInstruction = `You are TA TECH Academy's AI Academic Consultant. Your goal is to provide concise, friendly, encouraging advice for parents and students choosing Physics & IT/AI courses (Physics / Vật Lý, IC3 Spark, MOS, Python, Scratch, Algorithms, Applied AI). Keep answers clear and actionable. Recommend specific courses based on student age/goals.`;
 
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
-        contents: `${systemInstruction}\n\nUser Question: ${prompt}\nStudent Context: Age/Grade = ${studentAge || 'Not specified'}, Goal = ${goal || 'Learn AI/IT'}`
+        contents: `${systemInstruction}\n\nUser Question: ${prompt}\nStudent Context: Age/Grade = ${studentAge || 'Not specified'}, Goal = ${goal || 'Learn Physics/AI/IT'}`
       });
 
-      res.json({ reply: response.text || "Thank you for your question! We recommend exploring our Python & AI Roadmap for maximum future readiness." });
+      res.json({ reply: response.text || "Thank you for your question! We recommend exploring our Physics & IT/AI Roadmap for maximum future readiness." });
     } catch (err: any) {
       console.error("Gemini API Error:", err);
       res.json({
-        reply: "Nexus Academy recommends starting with our Primary/Middle School Scratch & Python roadmap or Applied AI for Adults. Fill out our quick form for a personalized consultation!"
+        reply: "TA TECH Academy recommends starting with our Physics / Vật Lý roadmap, Primary/Middle School Scratch & Python, or Applied AI for Adults. Fill out our quick form for a personalized consultation!"
       });
     }
   });
@@ -169,7 +169,7 @@ async function startServer() {
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Nexus Academy Server running on http://0.0.0.0:${PORT}`);
+    console.log(`TA TECH Academy Server running on http://0.0.0.0:${PORT}`);
   });
 }
 

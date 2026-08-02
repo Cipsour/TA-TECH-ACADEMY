@@ -101,7 +101,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
         <div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-950 border border-blue-800 text-cyan-400 text-xs font-semibold mb-2">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>Cổng Đăng Ký Tuyển Sinh Nexus</span>
+            <span>Cổng Đăng Ký Tuyển Sinh TA TECH</span>
           </div>
           <h3 className="text-2xl font-extrabold text-white">
             {step === 3 ? "Đăng Ký Thành Công!" : "Đăng Ký Học Thử Miễn Phí"}

@@ -12,7 +12,7 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenRegisterModal })
   const [messages, setMessages] = useState<Array<{ sender: 'ai' | 'user'; text: string }>>([
     {
       sender: 'ai',
-      text: "Xin chào! Tôi là Trợ lý AI Tư vấn Giáo dục của Học viện Nexus. Hãy chia sẻ độ tuổi, khối lớp hoặc mục tiêu học tập của bạn, tôi sẽ đề xuất lộ trình IT & AI tối ưu nhất!"
+      text: "Xin chào! Tôi là Trợ lý AI Tư vấn Giáo dục của Học viện TA TECH. Hãy chia sẻ độ tuổi, khối lớp hoặc mục tiêu học tập của bạn, tôi sẽ đề xuất lộ trình Vật Lý & IT/AI tối ưu nhất!"
     }
   ]);
   const [loading, setLoading] = useState(false);
@@ -42,7 +42,7 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenRegisterModal })
     } catch (err) {
       setMessages(prev => [...prev, {
         sender: 'ai',
-        text: "Học viện Nexus khuyến nghị bạn bắt đầu với Lộ trình Lập trình & AI THCS 72 buổi hoặc Khóa luyện thi Chứng chỉ IC3 Spark! Bạn có muốn đăng ký một buổi học thử 1-1 miễn phí không?"
+        text: "Học viện TA TECH khuyến nghị bạn bắt đầu với Lộ trình Chuyên Lý / Lập trình & AI THCS 72 buổi hoặc Khóa luyện thi Chứng chỉ IC3 Spark! Bạn có muốn đăng ký một buổi học thử 1-1 miễn phí không?"
       }]);
     } finally {
       setLoading(false);
@@ -86,7 +86,7 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenRegisterModal })
                 </div>
               </div>
               <div>
-                <div className="font-bold text-sm text-white">Trợ Lý AI Nexus Consultation</div>
+                <div className="font-bold text-sm text-white">Trợ Lý AI TA TECH Consultation</div>
                 <div className="text-[10px] text-emerald-400 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   <span>Trực tuyến • Gemini 2.5 Flash Engine</span>

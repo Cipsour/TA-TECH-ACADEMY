@@ -18,7 +18,7 @@ export const ArchitectureViewer: React.FC<ArchitectureViewerProps> = ({ onApprov
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<'info' | 'prisma' | 'components' | 'stack'>('info');
 
-  const prismaSchemaCode = `// Prisma Database Schema cho Học viện CNTT & AI Nexus
+  const prismaSchemaCode = `// Prisma Database Schema cho Học viện Vật Lý & CNTT TA TECH
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -153,10 +153,10 @@ model Lead {
                 <span>GIAI ĐOẠN 1: KIẾN TRÚC HỆ THỐNG & ERD</span>
               </div>
               <h2 className="text-3xl font-extrabold text-white">
-                Kiến Trúc Nền Tảng Giáo Dục Nexus
+                Kiến Trúc Nền Tảng Giáo Dục TA TECH
               </h2>
               <p className="text-xs text-slate-300 mt-1 max-w-2xl">
-                Bản thiết kế tổng thể từ Kiến trúc sư Giải pháp cho Học viện CNTT & AI Nexus. Bao gồm Schema cơ sở dữ liệu quan hệ, cấu trúc Component và luồng tích hợp CRM/LMS.
+                Bản thiết kế tổng thể từ Kiến trúc sư Giải pháp cho Học viện Vật Lý & CNTT TA TECH. Bao gồm Schema cơ sở dữ liệu quan hệ, cấu trúc Component và luồng tích hợp CRM/LMS.
               </p>
             </div>
 
