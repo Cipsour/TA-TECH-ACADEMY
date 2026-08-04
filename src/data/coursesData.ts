@@ -55,8 +55,8 @@ export const COURSES_DATA: Course[] = [
     description: "Chương trình Khoa học Máy tính toàn diện 72 buổi với 7 học phần từ Tư duy lập trình, Scratch, Python, Cấu trúc dữ liệu, Thuật toán đến tích hợp AI Agent.",
     coverImage: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=800&auto=format&fit=crop&q=80",
     targetAge: "Học sinh THCS (Lớp 6 - Lớp 9)",
-    price: 18500000,
-    originalPrice: 22000000,
+    price: 1850000,
+    originalPrice: 2200000,
     category: "Programming",
     duration: "72 Buổi (90 phút/buổi)",
     isPublished: true,
@@ -72,7 +72,7 @@ export const COURSES_DATA: Course[] = [
         title: "HP1: Tư duy Lập trình & Logic Thuật toán (8 Buổi)",
         order: 1,
         lessons: [
-          { id: "l-hp1-1", title: "HP1.1: Phân tích Bài toán thành Sơ đồ Khối (Flowchart)", duration: "90 phút", content: "Rèn luyện tư duy logic từng bước, cây điều kiện và giả mã pseudo-code.", order: 1 },
+          { id: "l-hp1-1", title: "HP1.1: Phân tích Bài toán", duration: "90 phút", content: "Rèn luyện tư duy lập trình tuần tự", order: 1 },
           { id: "l-hp1-2", title: "HP1.2: Tuần tự, Biến số & Kiểu Dữ liệu", duration: "90 phút", content: "Tìm hiểu lưu trữ biến trong bộ nhớ, nhập xuất và xử lý dữ liệu.", order: 2 }
         ]
       },
@@ -112,7 +112,7 @@ export const COURSES_DATA: Course[] = [
       },
       {
         id: "hp6",
-        title: "HP6: Đồ án Tốt nghiệp Phần mềm (8 Buổi)",
+        title: "HP6: Dự án cuối khóa (8 Buổi)",
         order: 6,
         lessons: [
           { id: "l-hp6-1", title: "HP6.1: Thiết kế Kiến trúc & Giao diện GUI", duration: "90 phút", content: "Tạo giao diện ứng dụng với Tkinter/Pygame và quản lý mã nguồn Git.", order: 1 }
@@ -180,7 +180,7 @@ export const COURSES_DATA: Course[] = [
     slug: "applied-ai-prompt-engineering",
     description: "Làm chủ các công cụ Generative AI hàng đầu (ChatGPT, Gemini, Claude, Prompt Engineering & Tự động hóa) giúp x10 hiệu suất công việc cá nhân.",
     coverImage: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&auto=format&fit=crop&q=80",
-    targetAge: "Sinh viên & Người đi làm",
+    targetAge: "Người đi làm",
     price: 4500000,
     originalPrice: 6000000,
     category: "Applied AI",
