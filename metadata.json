@@ -1,0 +1,6 @@
+{
+  "name": "TA TECH Academy",
+  "description": "Educational platform and LMS/CRM foundation for Physics & IT/AI Training Center, featuring interactive course catalog, student learning dashboard, and lead CRM.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
