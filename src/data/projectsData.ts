@@ -7,7 +7,7 @@ export const STUDENT_PROJECTS_DATA: StudentProject[] = [
     studentName: "Nguyễn Minh Triết",
     studentAge: 12,
     projectType: "SCRATCH 2D GAME",
-    thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80",
+    thumbnail: "assets\\images\\space-shooter.jpg",
     description: "Trò chơi không gian với hiệu ứng va chạm nhân bản (cloning), lưu điểm cao kỷ lục và nhạc nền tự tạo.",
     techStack: ["Scratch 3.0", "Cloning", "Variables"],
     likesCount: 142
@@ -18,7 +18,7 @@ export const STUDENT_PROJECTS_DATA: StudentProject[] = [
     studentName: "Trần Đức Hoàng",
     studentAge: 15,
     projectType: "PYTHON & AI AGENT",
-    thumbnail: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80",
+    thumbnail: "assets\\images\\face-recognize.jpg",
     description: "Sử dụng OpenCV Python và Gemini AI API để tự động điểm danh khuôn mặt học sinh và gửi tin nhắn báo về Zalo phụ huynh.",
     techStack: ["Python 3.12", "OpenCV", "Gemini API"],
     likesCount: 289
@@ -29,7 +29,7 @@ export const STUDENT_PROJECTS_DATA: StudentProject[] = [
     studentName: "Lê Ngọc Bảo An",
     studentAge: 10,
     projectType: "AI CHATBOT APP",
-    thumbnail: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80",
+    thumbnail: "assets\\images\\AI-assistant.jpg",
     description: "Ứng dụng trắc nghiệm kiến thức máy tính IC3 Spark tự động chấm điểm và đưa ra giải thích đáp án bằng AI.",
     techStack: ["Python", "Tkinter", "AI Prompting"],
     likesCount: 198
