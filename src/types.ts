@@ -1,5 +1,14 @@
 export type UserRole = 'VISITOR' | 'STUDENT' | 'ADMIN';
 
+export interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  role: 'ADMIN' | 'TEACHER' | 'STUDENT';
+  avatarUrl?: string;
+  phone?: string;
+}
+
 export type LeadStatus = 'NEW' | 'CONTACTED' | 'CONVERTED';
 export type LeadSource = 'FORM' | 'ZALO' | 'LANDING';
 

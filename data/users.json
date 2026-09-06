@@ -1,0 +1,22 @@
+[
+  {
+    "id": "user-admin-01",
+    "email": "admin@tuananhtinhoc.info.vn",
+    "name": "Thầy Tuấn Anh (Admin)",
+    "role": "ADMIN",
+    "passwordHash": "509177a6372d6f527c1d76378e9f2420fe2fa619d8dd8f4a1321703ad8f2f211",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
+    "phone": "0988888888",
+    "createdAt": "2026-09-06T16:00:00.000Z"
+  },
+  {
+    "id": "user-student-01",
+    "email": "hocvien@tuananhtinhoc.info.vn",
+    "name": "Nguyễn Minh Quân (Học viên)",
+    "role": "STUDENT",
+    "passwordHash": "7fe83e4798e9862804ec65ea07e2474f8846c4f69fc3ca2586ce17bb8ee09bb8",
+    "avatarUrl": "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=80",
+    "phone": "0912345678",
+    "createdAt": "2026-09-06T16:00:00.000Z"
+  }
+]

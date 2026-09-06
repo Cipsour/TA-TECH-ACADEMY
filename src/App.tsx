@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { UserRole } from './types';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
@@ -14,8 +14,11 @@ import { AdminCrm } from './components/AdminCrm';
 import { ArchitectureViewer } from './components/ArchitectureViewer';
 import { Footer } from './components/Footer';
 import { RegistrationModal } from './components/RegistrationModal';
+import { LoginModal } from './components/LoginModal';
+import { AuthProvider, useAuth } from './context/AuthContext';
 
-export const App: React.FC = () => {
+const MainLayout: React.FC = () => {
+  const { user, isLoginModalOpen, closeLoginModal } = useAuth();
   const [activeRole, setActiveRole] = useState<UserRole>('VISITOR');
   const [activeTab, setActiveTab] = useState<string>('home');
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState<boolean>(false);
@@ -25,6 +28,14 @@ export const App: React.FC = () => {
     const saved = localStorage.getItem('theme_mode');
     return saved ? saved === 'dark' : true;
   });
+
+  // Tự động chuyển về vai trò VISITOR nếu tài khoản đăng xuất
+  useEffect(() => {
+    if (!user && (activeRole === 'ADMIN' || activeRole === 'STUDENT')) {
+      setActiveRole('VISITOR');
+      setActiveTab('home');
+    }
+  }, [user, activeRole]);
 
   const handleToggleTheme = () => {
     const newMode = !isDarkMode;
@@ -47,14 +58,23 @@ export const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleLoginSuccess = (role: 'ADMIN' | 'STUDENT') => {
+    if (role === 'ADMIN') {
+      setActiveRole('ADMIN');
+      setActiveTab('admin');
+    } else {
+      setActiveRole('STUDENT');
+      setActiveTab('lms');
+    }
+  };
+
   return (
     <div 
       className={`min-h-screen font-sans selection:bg-cyan-500 selection:text-slate-950 antialiased transition-colors duration-300 ${
         isDarkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900 light-mode'
       }`}
     >
-      
-      {/* Main Responsive Header */}
+      {/* Header Điều Hướng Toàn Cục */}
       <Header
         activeRole={activeRole}
         setActiveRole={setActiveRole}
@@ -65,7 +85,7 @@ export const App: React.FC = () => {
         onToggleTheme={handleToggleTheme}
       />
 
-      {/* Main Dynamic View Switching */}
+      {/* Chuyển Đổi Phân Hệ Theo Vai Trò */}
       <main>
         {activeRole === 'STUDENT' ? (
           <LmsPortal />
@@ -114,26 +134,40 @@ export const App: React.FC = () => {
             )}
 
             {activeTab === 'architecture' && (
-              <ArchitectureViewer />
+              <ArchitectureViewer onApprovePhase1={() => {}} />
             )}
           </div>
         )}
       </main>
 
-      {/* Footer */}
+      {/* Footer Chân Trang */}
       <Footer 
         onNavigateTab={handleNavigateTab} 
         onOpenRegisterModal={() => handleOpenRegisterModal()} 
       />
 
-      {/* Course Registration Modal */}
+      {/* Modal Đăng Ký Khóa Học Tuyển Sinh */}
       <RegistrationModal
         isOpen={isRegisterModalOpen}
         onClose={handleCloseRegisterModal}
         preselectedCourse={registerCourseName}
       />
 
+      {/* Modal Đăng Nhập Đa Vai Trò (Admin & Học Viên) */}
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={closeLoginModal}
+        onLoginSuccess={handleLoginSuccess}
+      />
     </div>
+  );
+};
+
+export const App: React.FC = () => {
+  return (
+    <AuthProvider>
+      <MainLayout />
+    </AuthProvider>
   );
 };
 

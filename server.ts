@@ -1,63 +1,88 @@
 import express from "express";
 import path from "path";
+import crypto from "crypto";
+import dotenv from "dotenv";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
-import dotenv from "dotenv";
 
 dotenv.config();
 
-interface Lead {
-  id: string;
+import { 
+  getAllLeads, 
+  createLead, 
+  updateLead, 
+  generateLeadsCsv, 
+  Lead,
+  findUserByEmail,
+  findUserById,
+  verifyPassword
+} from "./server/db";
+
+const JWT_SECRET = process.env.JWT_SECRET || "ta_tech_academy_jwt_secret_key_2026";
+
+interface TokenPayload {
+  userId: string;
+  email: string;
+  role: string;
   name: string;
-  phone: string;
-  email?: string;
-  grade?: string;
-  desiredCourse: string;
-  notes?: string;
-  source: 'FORM' | 'ZALO' | 'LANDING';
-  status: 'NEW' | 'CONTACTED' | 'CONVERTED';
-  createdAt: string;
+  exp: number;
 }
 
-// In-memory data store seeded with realistic data
-const leadsStore: Lead[] = [
-  {
-    id: "lead-101",
-    name: "Nguyen Van An",
-    phone: "0912345678",
-    email: "an.nguyen@gmail.com",
-    grade: "Grade 7 (Secondary)",
-    desiredCourse: "Middle School Programming Roadmap (Python & Scratch)",
-    notes: "Parent looking for weekend classes for kid interested in robotics.",
-    source: "FORM",
-    status: "NEW",
-    createdAt: new Date(Date.now() - 3600000 * 4).toISOString()
-  },
-  {
-    id: "lead-102",
-    name: "Tran Thi Mai",
-    phone: "0987654321",
-    email: "mai.tran@office.com",
-    grade: "Working Professional",
-    desiredCourse: "Applied AI & Prompt Engineering for Productivity",
-    notes: "Wants corporate training package or evening group session.",
-    source: "ZALO",
-    status: "CONTACTED",
-    createdAt: new Date(Date.now() - 3600000 * 24).toISOString()
-  },
-  {
-    id: "lead-103",
-    name: "Le Hoang Nam",
-    phone: "0901122334",
-    email: "nam.le@student.edu.vn",
-    grade: "University Senior",
-    desiredCourse: "MOS Certification (Word, Excel, PowerPoint)",
-    notes: "Needs certification before graduation deadline next month.",
-    source: "FORM",
-    status: "CONVERTED",
-    createdAt: new Date(Date.now() - 3600000 * 48).toISOString()
+// Hàm sinh token xác thực có chữ ký HMAC-SHA256 (Hạn 7 ngày)
+function generateToken(payload: Omit<TokenPayload, 'exp'>): string {
+  const fullPayload: TokenPayload = {
+    ...payload,
+    exp: Date.now() + 7 * 24 * 60 * 60 * 1000
+  };
+  const data = Buffer.from(JSON.stringify(fullPayload)).toString('base64url');
+  const signature = crypto.createHmac('sha256', JWT_SECRET).update(data).digest('base64url');
+  return `${data}.${signature}`;
+}
+
+// Hàm xác minh tính hợp lệ và thời hạn của token
+function verifyToken(token: string): TokenPayload | null {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 2) return null;
+    const [data, signature] = parts;
+    const expectedSignature = crypto.createHmac('sha256', JWT_SECRET).update(data).digest('base64url');
+    if (signature !== expectedSignature) return null;
+    const payload: TokenPayload = JSON.parse(Buffer.from(data, 'base64url').toString('utf-8'));
+    if (payload.exp < Date.now()) return null;
+    return payload;
+  } catch {
+    return null;
   }
-];
+}
+
+// Middleware xác thực và phân quyền truy cập
+function requireAuth(allowedRoles?: string[]) {
+  return (req: any, res: any, next: any) => {
+    let token = '';
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
+    } else if (req.query && typeof req.query.token === 'string') {
+      token = req.query.token; // Cho phép tải file qua URL query (như xuất CSV)
+    }
+
+    if (!token) {
+      return res.status(401).json({ success: false, error: "Yêu cầu đăng nhập để truy cập tài nguyên này." });
+    }
+
+    const payload = verifyToken(token);
+    if (!payload) {
+      return res.status(401).json({ success: false, error: "Phiên đăng nhập không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại." });
+    }
+
+    if (allowedRoles && allowedRoles.length > 0 && !allowedRoles.includes(payload.role)) {
+      return res.status(403).json({ success: false, error: "Bạn không có quyền truy cập vào phân hệ này." });
+    }
+
+    req.user = payload;
+    next();
+  };
+}
 
 async function startServer() {
   const app = express();
@@ -70,57 +95,134 @@ async function startServer() {
     res.json({ status: "ok", service: "TA TECH Academy Backend", timestamp: new Date() });
   });
 
-  // Get all leads (Admin CRM)
-  app.get("/api/leads", (req, res) => {
-    res.json({ success: true, count: leadsStore.length, leads: leadsStore });
+  // API Đăng nhập
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      if (!email || !password) {
+        return res.status(400).json({ success: false, error: "Vui lòng nhập đầy đủ Email và Mật khẩu." });
+      }
+
+      const user = await findUserByEmail(email);
+      if (!user || !verifyPassword(password, user.passwordHash)) {
+        return res.status(401).json({ success: false, error: "Email hoặc mật khẩu không chính xác." });
+      }
+
+      const token = generateToken({
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+        name: user.name
+      });
+
+      const safeUser = {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        avatarUrl: user.avatarUrl,
+        phone: user.phone
+      };
+
+      res.json({
+        success: true,
+        message: "Đăng nhập thành công!",
+        token,
+        user: safeUser
+      });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message });
+    }
   });
 
-  // Create new lead (Public Registration Form)
-  app.post("/api/leads", (req, res) => {
-    const { name, phone, email, grade, desiredCourse, notes, source } = req.body;
-    
-    if (!name || !phone || !desiredCourse) {
-      return res.status(400).json({ success: false, error: "Name, phone, and desired course are required." });
+  // API Kiểm tra phiên đăng nhập hiện tại
+  app.get("/api/auth/me", requireAuth(), async (req: any, res) => {
+    try {
+      const user = await findUserById(req.user.userId);
+      if (!user) {
+        return res.status(404).json({ success: false, error: "Không tìm thấy thông tin tài khoản." });
+      }
+      const safeUser = {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        avatarUrl: user.avatarUrl,
+        phone: user.phone
+      };
+      res.json({ success: true, user: safeUser });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message });
     }
-
-    const newLead: Lead = {
-      id: `lead-${Date.now()}`,
-      name,
-      phone,
-      email: email || "",
-      grade: grade || "General",
-      desiredCourse,
-      notes: notes || "",
-      source: source || 'FORM',
-      status: 'NEW',
-      createdAt: new Date().toISOString()
-    };
-
-    leadsStore.unshift(newLead);
-
-    res.status(201).json({
-      success: true,
-      message: "Registration received successfully! Our academic advisor will contact you within 15 minutes.",
-      lead: newLead,
-      zaloRedirectUrl: `https://zalo.me/0988888888?text=${encodeURIComponent(`Xin chào, tôi vừa đăng ký khóa học ${desiredCourse} cho học viên ${name} (SĐT: ${phone}).`)}`
-    });
   });
 
-  // Update lead status (Admin CRM)
-  app.patch("/api/leads/:id", (req, res) => {
-    const { id } = req.params;
-    const { status } = req.body;
-    const lead = leadsStore.find(l => l.id === id);
-
-    if (!lead) {
-      return res.status(404).json({ success: false, error: "Lead not found." });
+  // Get all leads (Bảo vệ: Chỉ ADMIN mới được xem danh sách tuyển sinh)
+  app.get("/api/leads", requireAuth(['ADMIN']), async (req, res) => {
+    try {
+      const leads = await getAllLeads();
+      res.json({ success: true, count: leads.length, leads });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message });
     }
+  });
 
-    if (status && ['NEW', 'CONTACTED', 'CONVERTED'].includes(status)) {
-      lead.status = status;
+  // Xuất danh sách Lead ra file CSV chuẩn UTF-8 (Bảo vệ: Chỉ ADMIN)
+  app.get("/api/leads/export/csv", requireAuth(['ADMIN']), async (req, res) => {
+    try {
+      const csvData = await generateLeadsCsv();
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename=leads-tuananhtinhoc-${new Date().toISOString().slice(0, 10)}.csv`);
+      res.send(csvData);
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message });
     }
+  });
 
-    res.json({ success: true, lead });
+  // Create new lead (Public Registration Form - lưu trữ vĩnh viễn)
+  app.post("/api/leads", async (req, res) => {
+    try {
+      const { name, phone, email, grade, desiredCourse, notes, source } = req.body;
+      
+      if (!name || !phone || !desiredCourse) {
+        return res.status(400).json({ success: false, error: "Name, phone, and desired course are required." });
+      }
+
+      const newLead = await createLead({
+        name,
+        phone,
+        email: email || "",
+        grade: grade || "General",
+        desiredCourse,
+        notes: notes || "",
+        source: source || 'FORM'
+      });
+
+      res.status(201).json({
+        success: true,
+        message: "Registration received successfully! Our academic advisor will contact you within 15 minutes.",
+        lead: newLead,
+        zaloRedirectUrl: `https://zalo.me/0988888888?text=${encodeURIComponent(`Xin chào, tôi vừa đăng ký khóa học ${desiredCourse} cho học viên ${name} (SĐT: ${phone}).`)}`
+      });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // Update lead status (Admin CRM - bảo vệ: Chỉ ADMIN)
+  app.patch("/api/leads/:id", requireAuth(['ADMIN']), async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status, notes } = req.body;
+
+      const updated = await updateLead(id, { status, notes });
+      if (!updated) {
+        return res.status(404).json({ success: false, error: "Lead not found." });
+      }
+
+      res.json({ success: true, lead: updated });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message });
+    }
   });
 
   // AI Learning Assistant Advisor Endpoint (Gemini API Integration)

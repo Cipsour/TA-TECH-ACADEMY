@@ -42,7 +42,31 @@ cd tuananhtinhoc-academy
 
 ---
 
-## BƯỚC 3: Chạy Tự Động Build & Khởi Chạy Server (Port 3000)
+## BƯỚC 3: Cấu Hình Biến Môi Trường (.env) & Cơ Sở Dữ Liệu (PostgreSQL)
+
+Tạo file `.env` từ file mẫu:
+
+```bash
+cp .env.example .env
+nano .env
+```
+
+Điền các thông số:
+- `GEMINI_API_KEY`: Khóa API Google Gemini của bạn.
+- `DATABASE_URL`: Chuỗi kết nối PostgreSQL (Ví dụ: `postgresql://postgres:MatKhau@localhost:5432/tuananhtinhoc_db?schema=public`).
+
+*(Mẹo: Nếu bạn muốn cài PostgreSQL trực tiếp trên Ubuntu VPS, chỉ cần chạy lệnh sau trong 1 phút):*
+```bash
+sudo apt update
+sudo apt install postgresql postgresql-contrib -y
+sudo -u postgres psql -c "CREATE DATABASE tuananhtinhoc_db;"
+sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'MatKhauCuaBan123';"
+```
+*(Nếu bạn chưa cài PostgreSQL ngay, hệ thống sẽ tự động lưu dữ liệu vào `data/leads.json` nên tuyệt đối không bị gián đoạn hay mất dữ liệu đăng ký).*
+
+---
+
+## BƯỚC 4: Chạy Tự Động Build & Khởi Chạy Server (Port 3000)
 
 Cấp quyền thực thi và chạy script tự động đã tạo sẵn:
 
@@ -53,12 +77,13 @@ chmod +x deploy-server.sh
 
 Script sẽ tự động:
 1. Cài đặt các thư viện Node.js (`npm install`)
-2. Biên dịch Frontend & Backend thành tệp `dist/server.cjs` (`npm run build`)
-3. Khởi chạy ứng dụng chạy ngầm bằng PM2 (`pm2 start ecosystem.config.cjs`)
+2. Khởi tạo Prisma ORM Client & đồng bộ database (`prisma generate` & `prisma db push`)
+3. Biên dịch Frontend & Backend thành tệp `dist/server.cjs` (`npm run build`)
+4. Khởi chạy ứng dụng chạy ngầm bằng PM2 (`pm2 start ecosystem.config.cjs`)
 
 ---
 
-## BƯỚC 4: Cấu Hình Nginx Reverse Proxy Cho Domain `tuananhtinhoc.info.vn`
+## BƯỚC 5: Cấu Hình Nginx Reverse Proxy Cho Domain `tuananhtinhoc.info.vn`
 
 Tạo file cấu hình Nginx trên Server:
 
@@ -97,7 +122,7 @@ sudo systemctl reload nginx
 
 ---
 
-## BƯỚC 5: Kích Hoạt Miễn Phí Chứng Chỉ SSL HTTPS (Let's Encrypt)
+## BƯỚC 6: Kích Hoạt Miễn Phí Chứng Chỉ SSL HTTPS (Let's Encrypt)
 
 Đảm bảo tên miền **tuananhtinhoc.info.vn** đã trỏ bản ghi **A record** về IP `14.225.46.204` trên nhà cung cấp tên miền của bạn, sau đó chạy:
 
@@ -111,7 +136,7 @@ Certbot sẽ tự động cài đặt chứng chỉ SSL HTTPS và tự động g
 
 ---
 
-## BƯỚC 6: Kiểm Tra Quản Lý Tiến Trình
+## BƯỚC 7: Kiểm Tra Quản Lý Tiến Trình
 
 - Xem danh sách app đang chạy: `pm2 status`
 - Xem log hoạt động: `pm2 logs`

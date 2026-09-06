@@ -8,23 +8,33 @@ import {
   Search, 
   Clock, 
   RefreshCw,
-  ShieldCheck
+  ShieldCheck,
+  Download,
+  Lock,
+  LogIn
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 interface AdminCrmProps {
   initialLeads?: Lead[];
 }
 
 export const AdminCrm: React.FC<AdminCrmProps> = () => {
+  const { user, token, openLoginModal } = useAuth();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [statusFilter, setStatusFilter] = useState<string>('TẤT CẢ');
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   const fetchLeads = async () => {
+    if (!token) return;
     setLoading(true);
     try {
-      const res = await fetch('/api/leads');
+      const res = await fetch('/api/leads', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       const data = await res.json();
       if (data.success && data.leads) {
         setLeads(data.leads);
@@ -36,15 +46,25 @@ export const AdminCrm: React.FC<AdminCrmProps> = () => {
     }
   };
 
+  const handleExportCsv = () => {
+    const url = token ? `/api/leads/export/csv?token=${encodeURIComponent(token)}` : '/api/leads/export/csv';
+    window.open(url, '_blank');
+  };
+
   useEffect(() => {
-    fetchLeads();
-  }, []);
+    if (token) {
+      fetchLeads();
+    }
+  }, [token]);
 
   const handleUpdateStatus = async (id: string, newStatus: LeadStatus) => {
     try {
       await fetch(`/api/leads/${id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ status: newStatus })
       });
 
@@ -75,6 +95,35 @@ export const AdminCrm: React.FC<AdminCrmProps> = () => {
   const convertedLeads = leads.filter(l => l.status === 'CONVERTED').length;
   const conversionRate = totalLeads > 0 ? Math.round((convertedLeads / totalLeads) * 100) : 0;
 
+  // Nếu chưa đăng nhập hoặc không phải Admin, chặn hiển thị và yêu cầu đăng nhập
+  if (!user || user.role !== 'ADMIN') {
+    return (
+      <div className="min-h-[80vh] bg-slate-950 text-white py-20 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+        <div className="max-w-md w-full rounded-3xl bg-slate-900 border border-amber-800/60 p-8 text-center space-y-6 shadow-2xl relative overflow-hidden">
+          <div className="w-16 h-16 rounded-2xl bg-amber-950/80 border border-amber-800/80 flex items-center justify-center mx-auto text-amber-400 shadow-lg shadow-amber-950/50">
+            <Lock className="w-8 h-8" />
+          </div>
+          <div>
+            <div className="inline-block px-3 py-1 rounded-full bg-amber-950/80 border border-amber-800/60 text-amber-400 text-[10px] font-bold uppercase mb-2">
+              Khu vực bảo mật
+            </div>
+            <h3 className="text-xl font-bold text-white">Yêu Cầu Quyền Quản Trị Viên</h3>
+            <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+              Khu vực CRM quản lý thông tin tuyển sinh chỉ dành riêng cho Thầy Tuấn Anh và Quản trị viên của Học viện TA TECH.
+            </p>
+          </div>
+          <button
+            onClick={() => openLoginModal('ADMIN')}
+            className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-600 to-orange-500 hover:from-amber-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xl shadow-amber-600/30 cursor-pointer transition-all"
+          >
+            <LogIn className="w-4 h-4" />
+            <span>Đăng Nhập Tài Khoản Admin CRM</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 text-white py-10 px-4 sm:px-6 lg:px-8 border-b border-slate-800">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -94,13 +143,24 @@ export const AdminCrm: React.FC<AdminCrmProps> = () => {
             </p>
           </div>
 
-          <button
-            onClick={fetchLeads}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:border-slate-600 text-xs text-slate-300 font-semibold cursor-pointer"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 text-cyan-400 ${loading ? 'animate-spin' : ''}`} />
-            <span>Đồng Bộ Dữ Liệu Realtime</span>
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleExportCsv}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-950/80 border border-emerald-700/60 hover:bg-emerald-900 text-xs text-emerald-300 font-semibold cursor-pointer transition-colors shadow-lg shadow-emerald-950/40"
+              title="Xuất danh sách học viên đăng ký ra file Excel (.CSV)"
+            >
+              <Download className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Xuất Excel / CSV</span>
+            </button>
+
+            <button
+              onClick={fetchLeads}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:border-slate-600 text-xs text-slate-300 font-semibold cursor-pointer transition-colors"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 text-cyan-400 ${loading ? 'animate-spin' : ''}`} />
+              <span>Đồng Bộ Dữ Liệu Realtime</span>
+            </button>
+          </div>
         </div>
 
         {/* KPI Cards */}

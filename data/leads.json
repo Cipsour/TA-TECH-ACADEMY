@@ -1,0 +1,38 @@
+[
+  {
+    "id": "lead-101",
+    "name": "Nguyen Van An",
+    "phone": "0912345678",
+    "email": "an.nguyen@gmail.com",
+    "grade": "Grade 7 (Secondary)",
+    "desiredCourse": "Middle School Programming Roadmap (Python & Scratch)",
+    "notes": "Phụ huynh tìm lớp cuối tuần cho con định hướng lập trình & robotics.",
+    "source": "FORM",
+    "status": "NEW",
+    "createdAt": "2026-09-06T16:52:00.000Z"
+  },
+  {
+    "id": "lead-102",
+    "name": "Tran Thi Mai",
+    "phone": "0987654321",
+    "email": "mai.tran@office.com",
+    "grade": "Working Professional",
+    "desiredCourse": "Applied AI & Prompt Engineering for Productivity",
+    "notes": "Muốn học gói đào tạo AI ứng dụng cho khối văn phòng buổi tối.",
+    "source": "ZALO",
+    "status": "CONTACTED",
+    "createdAt": "2026-09-05T20:52:00.000Z"
+  },
+  {
+    "id": "lead-103",
+    "name": "Le Hoang Nam",
+    "phone": "0901122334",
+    "email": "nam.le@student.edu.vn",
+    "grade": "University Senior",
+    "desiredCourse": "MOS Certification (Word, Excel, PowerPoint)",
+    "notes": "Cần chứng chỉ tin học quốc tế chuẩn bị nộp hồ sơ tốt nghiệp.",
+    "source": "FORM",
+    "status": "CONVERTED",
+    "createdAt": "2026-09-04T20:52:00.000Z"
+  }
+]
