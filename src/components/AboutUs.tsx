@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, Building2, Award, Users, ShieldCheck, MapPin, PhoneCall, Mail, UserCheck, QrCode } from 'lucide-react';
+import { Sparkles, Building2, Award, Users, ShieldCheck, MapPin, PhoneCall, Mail, UserCheck, QrCode, Globe } from 'lucide-react';
 import { ZaloQrCode } from './ZaloQrCode';
 
 interface AboutUsProps {
@@ -101,16 +101,16 @@ export const AboutUs: React.FC<AboutUsProps> = ({ onOpenRegisterModal }) => {
           </div>
         </div>
 
-        {/* Facilities & Campuses */}
+        {/* Training Modes & Online Gamified LMS */}
         <div className="p-8 rounded-3xl bg-slate-900 border border-slate-800 space-y-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-6">
             <div>
               <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-cyan-400" />
-                <span>Cơ Sở Đào Tạo & Hình Thức Học Trực Tuyến</span>
+                <Globe className="w-5 h-5 text-cyan-400" />
+                <span>Mô Hình Đào Tạo Trực Tuyến & Hybrid Linh Hoạt</span>
               </h3>
               <p className="text-xs text-slate-400 mt-1">
-                Lớp học trực tiếp tại trung tâm hoặc trực tuyến tương tác qua hệ thống Gamified LMS.
+                Lớp học tương tác trực tiếp qua hệ thống Gamified LMS & Trợ lý AI Mentor 24/7.
               </p>
             </div>
             <button
@@ -123,15 +123,15 @@ export const AboutUs: React.FC<AboutUsProps> = ({ onOpenRegisterModal }) => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
             <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
-              <div className="font-bold text-sm text-cyan-400">Cơ Sở Chính</div>
-              <div className="text-slate-200 font-medium">47 Nguyễn Thái Bình, Phường Bến Thành, Quận 1, TP. HCM</div>
+              <div className="font-bold text-sm text-cyan-400">Hình Thức Học Linh Hoạt</div>
+              <div className="text-slate-200 font-medium">Học nhóm nhỏ tương tác cao hoặc Học Kèm 1-1 trực tiếp với Giảng viên</div>
               <div className="text-slate-400 text-[11px]">Hotline / Zalo: 0901315275 • Email: nguyentuananh.career@gmail.com</div>
             </div>
 
             <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
               <div className="font-bold text-sm text-cyan-400">Hệ Thống Học Trực Tuyến Gamified LMS</div>
               <div className="text-slate-200 font-medium">Làm nhiệm vụ nhận EXP, Bảng xếp hạng & AI Mentor tương tác 24/7</div>
-              <div className="text-slate-400 text-[11px]">Lớp nhóm nhỏ hoặc học 1-1 trực tiếp với Giảng viên</div>
+              <div className="text-slate-400 text-[11px]">Nộp bài tập real-time & nhận phản hồi tức thì từ chuyên gia</div>
             </div>
 
             <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800 flex items-center gap-4">
@@ -148,7 +148,7 @@ export const AboutUs: React.FC<AboutUsProps> = ({ onOpenRegisterModal }) => {
                   rel="noreferrer"
                   className="inline-block text-[11px] font-bold text-amber-400 hover:underline"
                 >
-                  MoChatZalo.me &rarr;
+                  Chat Zalo Trực Tiếp &rarr;
                 </a>
               </div>
             </div>

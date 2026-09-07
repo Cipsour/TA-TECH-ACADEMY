@@ -17,7 +17,8 @@ import {
   LogIn,
   LogOut,
   ShieldCheck,
-  Lock
+  Lock,
+  Zap
 } from 'lucide-react';
 import { UserRole } from '../types';
 import { useAuth } from '../context/AuthContext';
@@ -46,13 +47,13 @@ export const Header: React.FC<HeaderProps> = ({
 
   const navItems = [
     { id: 'home', label: 'Trang chủ', icon: BookOpen },
+    { id: 'workflow', label: 'Quy trình', icon: Zap },
     { id: 'courses', label: 'Khóa học', icon: GraduationCap },
-    { id: 'about', label: 'Giới thiệu', icon: Layers },
     { id: 'roadmap', label: 'Lộ trình', icon: MapPin },
     { id: 'projects', label: 'Sản phẩm', icon: Code },
     { id: 'ai-center', label: 'Tư vấn AI', icon: Sparkles },
+    { id: 'about', label: 'Giới thiệu', icon: Layers },
     { id: 'faq', label: 'Trợ giúp & FAQ', icon: User },
-    { id: 'architecture', label: 'Kiến trúc', icon: Layers },
   ];
 
   const { user, logout, openLoginModal } = useAuth();

@@ -238,7 +238,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
               </label>
               <textarea
                 rows={2}
-                placeholder="Ví dụ: Mong muốn học lớp thứ 7 & Chủ nhật tại cơ sở Cầu Giấy..."
+                placeholder="Ví dụ: Mong muốn học lớp tối thứ 7 & Chủ nhật hoặc tư vấn 1-1..."
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 focus:border-cyan-500 focus:outline-none text-xs text-white placeholder-slate-500"

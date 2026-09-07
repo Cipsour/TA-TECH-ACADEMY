@@ -3,6 +3,7 @@ import { UserRole } from './types';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { WhyChooseUs } from './components/WhyChooseUs';
+import { WorkflowSection } from './components/WorkflowSection';
 import { RoadmapTimeline } from './components/RoadmapTimeline';
 import { CourseCatalog } from './components/CourseCatalog';
 import { StudentProjects } from './components/StudentProjects';
@@ -11,7 +12,6 @@ import { AboutUs } from './components/AboutUs';
 import { FaqSection } from './components/FaqSection';
 import { LmsPortal } from './components/LmsPortal';
 import { AdminCrm } from './components/AdminCrm';
-import { ArchitectureViewer } from './components/ArchitectureViewer';
 import { Footer } from './components/Footer';
 import { RegistrationModal } from './components/RegistrationModal';
 import { LoginModal } from './components/LoginModal';
@@ -100,6 +100,7 @@ const MainLayout: React.FC = () => {
                   onNavigateRoadmap={() => handleNavigateTab('roadmap')} 
                 />
                 <WhyChooseUs onOpenRegisterModal={() => handleOpenRegisterModal()} />
+                <WorkflowSection onOpenRegisterModal={handleOpenRegisterModal} />
                 <CourseCatalog onOpenRegisterModal={handleOpenRegisterModal} />
                 <RoadmapTimeline onOpenRegisterModal={handleOpenRegisterModal} />
                 <StudentProjects />
@@ -107,6 +108,10 @@ const MainLayout: React.FC = () => {
                 <AiAssistant onOpenRegisterModal={handleOpenRegisterModal} />
                 <FaqSection onOpenRegisterModal={() => handleOpenRegisterModal()} />
               </>
+            )}
+
+            {activeTab === 'workflow' && (
+              <WorkflowSection onOpenRegisterModal={handleOpenRegisterModal} />
             )}
 
             {activeTab === 'courses' && (
@@ -131,10 +136,6 @@ const MainLayout: React.FC = () => {
 
             {activeTab === 'faq' && (
               <FaqSection onOpenRegisterModal={() => handleOpenRegisterModal()} />
-            )}
-
-            {activeTab === 'architecture' && (
-              <ArchitectureViewer onApprovePhase1={() => {}} />
             )}
           </div>
         )}

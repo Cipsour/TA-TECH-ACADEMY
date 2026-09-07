@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, MapPin, PhoneCall, Mail, ShieldCheck, Award, QrCode } from 'lucide-react';
+import { Sparkles, Globe, PhoneCall, Mail, ShieldCheck, Award, QrCode, Zap } from 'lucide-react';
 import { ZaloQrCode } from './ZaloQrCode';
 
 interface FooterProps {
@@ -81,6 +81,11 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateTab, onOpenRegisterMod
                 </button>
               </li>
               <li>
+                <button onClick={() => onNavigateTab('workflow')} className="hover:text-cyan-400 transition-colors cursor-pointer">
+                  Quy Trình Đào Tạo 5 Bước
+                </button>
+              </li>
+              <li>
                 <button onClick={() => onNavigateTab('lms')} className="hover:text-cyan-400 transition-colors cursor-pointer">
                   Cổng Học Viên LMS
                 </button>
@@ -90,21 +95,16 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateTab, onOpenRegisterMod
                   Quản Trị CRM Tuyển Sinh
                 </button>
               </li>
-              <li>
-                <button onClick={() => onNavigateTab('architecture')} className="hover:text-cyan-400 transition-colors cursor-pointer">
-                  Kiến Trúc Hệ Thống & ERD
-                </button>
-              </li>
             </ul>
           </div>
 
-          {/* Col 4: Campus Contact & Zalo QR */}
+          {/* Col 4: Training Mode & Contact & Zalo QR */}
           <div className="space-y-3">
-            <div className="font-bold text-sm text-white uppercase tracking-wider">Cơ Sở & Liên Hệ</div>
+            <div className="font-bold text-sm text-white uppercase tracking-wider">Hình Thức & Liên Hệ</div>
             <ul className="space-y-2 text-slate-400">
               <li className="flex items-start gap-2">
-                <MapPin className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-                <span><strong>Cơ sở chính:</strong> 47 Nguyễn Thái Bình, Bến Thành</span>
+                <Globe className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+                <span><strong>Hình thức:</strong> Đào tạo Trực tuyến & Hybrid Toàn quốc</span>
               </li>
               <li className="flex items-center gap-2">
                 <PhoneCall className="w-4 h-4 text-amber-400 shrink-0" />
