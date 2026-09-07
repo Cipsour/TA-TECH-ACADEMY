@@ -255,6 +255,10 @@ async function startServer() {
     }
   });
 
+  // Phục vụ thư mục hình ảnh tĩnh assets/images
+  app.use('/assets/images', express.static(path.join(process.cwd(), 'assets/images')));
+  app.use('/assets', express.static(path.join(process.cwd(), 'assets')));
+
   // Vite middleware setup
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({

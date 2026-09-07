@@ -201,44 +201,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({
           </button>
         </form>
 
-        {/* Quick Demo Credentials Box */}
-        <div className="mt-6 pt-5 border-t border-slate-800">
-          <div className="text-[11px] text-slate-400 mb-2 flex items-center justify-between">
-            <span className="font-semibold text-slate-300 flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-amber-400" />
-              Tài khoản mẫu kiểm thử (1-Click):
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 text-[11px]">
-            <button
-              type="button"
-              onClick={() => handleQuickFill('ADMIN')}
-              className="p-2.5 rounded-xl bg-slate-950 border border-amber-800/40 hover:border-amber-500/80 text-left transition-colors cursor-pointer group"
-            >
-              <div className="font-bold text-amber-400 flex items-center gap-1">
-                <ShieldCheck className="w-3 h-3" />
-                <span>Admin CRM</span>
-              </div>
-              <div className="text-[9px] text-slate-500 truncate">admin@tuananhtinhoc.info.vn</div>
-              <div className="text-[9px] text-amber-300/70 font-mono">Pass: Admin@123456</div>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleQuickFill('STUDENT')}
-              className="p-2.5 rounded-xl bg-slate-950 border border-emerald-800/40 hover:border-emerald-500/80 text-left transition-colors cursor-pointer group"
-            >
-              <div className="font-bold text-emerald-400 flex items-center gap-1">
-                <GraduationCap className="w-3 h-3" />
-                <span>Học Viên LMS</span>
-              </div>
-              <div className="text-[9px] text-slate-500 truncate">hocvien@tuananhtinhoc.info.vn</div>
-              <div className="text-[9px] text-emerald-300/70 font-mono">Pass: Hocvien@123456</div>
-            </button>
-          </div>
-        </div>
-
       </div>
     </div>
   );
