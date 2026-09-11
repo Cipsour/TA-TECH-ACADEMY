@@ -7,6 +7,10 @@ echo "  Bắt đầu triển khai TA TECH Academy"
 echo "  Tên miền: tuananhtinhoc.info.vn"
 echo "=========================================="
 
+# 0. Kéo mã nguồn mới nhất từ GitHub
+echo "[0/5] Kéo mã nguồn mới nhất từ GitHub (git pull)..."
+git pull origin main
+
 # 1. Cài đặt các gói phụ thuộc
 echo "[1/5] Cài đặt dependencies (npm install)..."
 npm install --production=false
