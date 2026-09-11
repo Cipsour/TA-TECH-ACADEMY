@@ -11,7 +11,10 @@ import {
   ShieldCheck,
   Download,
   Lock,
-  LogIn
+  LogIn,
+  Calendar,
+  Video,
+  MapPin
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -22,6 +25,8 @@ interface AdminCrmProps {
 export const AdminCrm: React.FC<AdminCrmProps> = () => {
   const { user, token, openLoginModal } = useAuth();
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [activeView, setActiveView] = useState<'LEADS' | 'BOOKINGS'>('LEADS');
   const [loading, setLoading] = useState<boolean>(true);
   const [statusFilter, setStatusFilter] = useState<string>('TẤT CẢ');
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -31,9 +36,7 @@ export const AdminCrm: React.FC<AdminCrmProps> = () => {
     setLoading(true);
     try {
       const res = await fetch('/api/leads', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
       if (data.success && data.leads) {
@@ -46,6 +49,21 @@ export const AdminCrm: React.FC<AdminCrmProps> = () => {
     }
   };
 
+  const fetchBookings = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch('/api/bookings', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.success && data.bookings) {
+        setBookings(data.bookings);
+      }
+    } catch (err) {
+      console.error("Không thể tải dữ liệu bookings:", err);
+    }
+  };
+
   const handleExportCsv = () => {
     const url = token ? `/api/leads/export/csv?token=${encodeURIComponent(token)}` : '/api/leads/export/csv';
     window.open(url, '_blank');
@@ -54,6 +72,7 @@ export const AdminCrm: React.FC<AdminCrmProps> = () => {
   useEffect(() => {
     if (token) {
       fetchLeads();
+      fetchBookings();
     }
   }, [token]);
 
@@ -202,7 +221,113 @@ export const AdminCrm: React.FC<AdminCrmProps> = () => {
           </div>
         </div>
 
-        {/* Filter & Search Bar */}
+        {/* View Mode Tabs (Leads vs Bookings) */}
+        <div className="flex items-center gap-3 border-b border-slate-800 pb-3">
+          <button
+            onClick={() => setActiveView('LEADS')}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer ${
+              activeView === 'LEADS'
+                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+                : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+            }`}
+          >
+            <Users className="w-4 h-4" />
+            <span>Danh Sách Đăng Ký ({leads.length})</span>
+          </button>
+
+          <button
+            onClick={() => setActiveView('BOOKINGS')}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer ${
+              activeView === 'BOOKINGS'
+                ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/30'
+                : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+            }`}
+          >
+            <Calendar className="w-4 h-4 text-amber-300" />
+            <span>Lịch Hẹn Đánh Giá 1-1 ({bookings.length})</span>
+          </button>
+        </div>
+
+        {activeView === 'BOOKINGS' ? (
+          /* Bookings Table View */
+          <div className="rounded-3xl bg-slate-900 border border-slate-800 overflow-hidden shadow-2xl space-y-4 p-4">
+            <h3 className="text-lg font-bold text-white flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-amber-400" />
+              <span>Danh Sách Lịch Hẹn Học Thử & Test Năng Lực 1-1</span>
+            </h3>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="bg-slate-950/80 text-slate-400 border-b border-slate-800 font-semibold uppercase tracking-wider text-[10px]">
+                    <th className="p-4">Họ Tên & SĐT</th>
+                    <th className="p-4">Khóa Học Quan Tâm</th>
+                    <th className="p-4">Ngày Hẹn & Khung Giờ</th>
+                    <th className="p-4">Hình Thức</th>
+                    <th className="p-4">Ngày Đặt</th>
+                    <th className="p-4">Trạng Thái</th>
+                    <th className="p-4 text-right">Hành Động</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-800/80 text-slate-200">
+                  {bookings.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="p-8 text-center text-slate-500">
+                        Chưa có lịch hẹn học thử nào được tạo.
+                      </td>
+                    </tr>
+                  ) : (
+                    bookings.map((b) => (
+                      <tr key={b.id} className="hover:bg-slate-800/50 transition-colors">
+                        <td className="p-4">
+                          <div className="font-bold text-white text-sm">{b.name}</div>
+                          <div className="text-cyan-400 font-mono text-[11px]">{b.phone}</div>
+                          {b.email && <div className="text-[10px] text-slate-400">{b.email}</div>}
+                        </td>
+                        <td className="p-4 font-semibold text-slate-200">
+                          {b.desiredCourse}
+                        </td>
+                        <td className="p-4">
+                          <div className="font-bold text-amber-400">{b.bookingDate}</div>
+                          <div className="text-[11px] text-slate-300">{b.timeSlot}</div>
+                        </td>
+                        <td className="p-4">
+                          <span className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border inline-flex items-center gap-1 ${
+                            b.format === 'ONLINE' ? 'bg-blue-950 border-blue-800 text-cyan-300' : 'bg-cyan-950 border-cyan-800 text-emerald-300'
+                          }`}>
+                            {b.format === 'ONLINE' ? <Video className="w-3 h-3" /> : <MapPin className="w-3 h-3" />}
+                            <span>{b.format === 'ONLINE' ? 'Online Zoom' : 'Trực tiếp'}</span>
+                          </span>
+                        </td>
+                        <td className="p-4 text-slate-400 text-[11px]">
+                          {new Date(b.createdAt).toLocaleDateString('vi-VN')}
+                        </td>
+                        <td className="p-4">
+                          <span className="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-950 border border-amber-800 text-amber-400">
+                            {b.status || 'PENDING'}
+                          </span>
+                        </td>
+                        <td className="p-4 text-right">
+                          <a
+                            href={`https://zalo.me/${b.phone.replace(/[^0-9]/g, '')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow transition-all"
+                          >
+                            <MessageCircle className="w-3.5 h-3.5" />
+                            <span>Xác Nhận Zalo</span>
+                          </a>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Filter & Search Bar */}
         <div className="rounded-2xl bg-slate-900 border border-slate-800 p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           
           {/* Search Box */}
@@ -329,6 +454,8 @@ export const AdminCrm: React.FC<AdminCrmProps> = () => {
             </table>
           </div>
         </div>
+        </>
+        )}
 
       </div>
     </div>

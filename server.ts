@@ -7,12 +7,17 @@ import { GoogleGenAI } from "@google/genai";
 
 dotenv.config();
 
+import nodemailer from "nodemailer";
 import { 
   getAllLeads, 
   createLead, 
   updateLead, 
   generateLeadsCsv, 
+  getAllBookings,
+  createBooking,
+  updateBookingStatus,
   Lead,
+  Booking,
   findUserByEmail,
   findUserById,
   verifyPassword
@@ -178,7 +183,36 @@ async function startServer() {
     }
   });
 
-// Helper function to send instant Telegram notification to Teacher's phone
+// Helper function to send instant Gmail notification to Teacher
+async function sendGmailNotification(subject: string, htmlContent: string) {
+  const user = process.env.GMAIL_USER;
+  const pass = process.env.GMAIL_APP_PASSWORD;
+  const receiver = process.env.NOTIFICATION_RECEIVER_EMAIL || user || "tuananh.tinhoc@gmail.com";
+
+  if (!user || !pass) {
+    console.log('[GMAIL NOTIFICATION] GMAIL_USER or GMAIL_APP_PASSWORD not configured in .env, skipping Gmail alert.');
+    return;
+  }
+
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: { user, pass }
+    });
+
+    await transporter.sendMail({
+      from: `"TA TECH ACADEMY Notification" <${user}>`,
+      to: receiver,
+      subject: subject,
+      html: htmlContent
+    });
+    console.log(`[GMAIL NOTIFICATION SUCCESS] Sent email alert to ${receiver}`);
+  } catch (err: any) {
+    console.error('[GMAIL NOTIFICATION ERROR]', err.message);
+  }
+}
+
+// Helper function to send instant Telegram notification to Teacher's phone for Leads
 async function sendTelegramBotNotification(lead: any) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
@@ -220,6 +254,44 @@ async function sendTelegramBotNotification(lead: any) {
   }
 }
 
+// Helper function to send instant Telegram notification for Bookings
+async function sendTelegramBookingNotification(booking: any) {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+
+  if (!token || !chatId) return;
+
+  const formatText = booking.format === 'ONLINE' ? '💻 Học Online qua Zoom' : '🏫 Học Trực tiếp tại Trung tâm';
+
+  const text = `📅 *LỊCH HẸN ĐÁNH GIÁ NĂNG LỰC 1-1 MỚI!*\n\n` +
+    `👤 *Phụ huynh/Học viên:* ${booking.name}\n` +
+    `📞 *SĐT:* ${booking.phone}\n` +
+    `📧 *Email:* ${booking.email || 'Chưa cung cấp'}\n` +
+    `🏫 *Khối lớp:* ${booking.grade || 'Mọi độ tuổi'}\n` +
+    `📚 *Khóa học quan tâm:* ${booking.desiredCourse}\n` +
+    `🗓 *Ngày hẹn:* ${booking.bookingDate}\n` +
+    `⏰ *Khung giờ:* ${booking.timeSlot}\n` +
+    `📍 *Hình thức:* ${formatText}\n` +
+    `📝 *Ghi chú:* ${booking.notes || 'Không có'}\n` +
+    `⏱ *Thời gian đặt:* ${new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })}\n\n` +
+    `👉 *Chat Zalo xác nhận lịch:* https://zalo.me/${booking.phone.replace(/[^0-9]/g, '')}`;
+
+  try {
+    const telegramUrl = `https://api.telegram.org/bot${token}/sendMessage`;
+    await fetch(telegramUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: text,
+        parse_mode: 'Markdown'
+      })
+    });
+  } catch (err: any) {
+    console.error('[BOT BOOKING NOTIFICATION ERROR]', err.message);
+  }
+}
+
   // Create new lead (Public Registration Form - lưu trữ vĩnh viễn)
   app.post("/api/leads", async (req, res) => {
     try {
@@ -239,8 +311,26 @@ async function sendTelegramBotNotification(lead: any) {
         source: source || 'FORM'
       });
 
-      // Tự động gửi tin nhắn báo về điện thoại Thầy ngay lập tức qua Telegram Bot
+      // Tự động gửi tin nhắn báo về điện thoại Thầy ngay lập tức qua Telegram Bot & Gmail
       sendTelegramBotNotification(newLead).catch(e => console.error("Notification trigger error:", e));
+
+      const emailSubject = `🔔 [TA TECH ACADEMY] Đăng ký mới từ ${name} (${phone})`;
+      const emailHtml = `
+        <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #0f172a; color: #ffffff; borderRadius: 12px;">
+          <h2 style="color: #38bdf8;">🔔 THÔNG BÁO HỌC VIÊN ĐĂNG KÝ MỚI</h2>
+          <hr style="border-color: #334155;" />
+          <p><strong>👤 Họ tên:</strong> ${name}</p>
+          <p><strong>📞 Số điện thoại:</strong> ${phone}</p>
+          <p><strong>📧 Email:</strong> ${email || 'Chưa cung cấp'}</p>
+          <p><strong>🏫 Khối lớp:</strong> ${grade || 'General'}</p>
+          <p><strong>📚 Khóa học đăng ký:</strong> ${desiredCourse}</p>
+          <p><strong>📝 Ghi chú:</strong> ${notes || 'Không có'}</p>
+          <p><strong>⏱ Thời gian:</strong> ${new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })}</p>
+          <br />
+          <a href="https://zalo.me/${phone.replace(/[^0-9]/g, '')}" style="background-color: #0284c7; color: white; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;">👉 Chat Zalo Với Học Viên</a>
+        </div>
+      `;
+      sendGmailNotification(emailSubject, emailHtml).catch(e => console.error("Gmail trigger error:", e));
 
       res.status(201).json({
         success: true,
@@ -248,6 +338,86 @@ async function sendTelegramBotNotification(lead: any) {
         lead: newLead,
         zaloRedirectUrl: `https://zalo.me/0901315275?text=${encodeURIComponent(`Xin chào Thầy Tuấn Anh, tôi vừa đăng ký khóa học ${desiredCourse} cho học viên ${name} (SĐT: ${phone}).`)}`
       });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // GET all Bookings (Admin CRM)
+  app.get("/api/bookings", requireAuth(['ADMIN']), async (req, res) => {
+    try {
+      const bookings = await getAllBookings();
+      res.json({ success: true, bookings });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // POST create new Booking slot
+  app.post("/api/bookings", async (req, res) => {
+    try {
+      const { name, phone, email, grade, desiredCourse, bookingDate, timeSlot, format, notes } = req.body;
+
+      if (!name || !phone || !desiredCourse || !bookingDate || !timeSlot) {
+        return res.status(400).json({ success: false, error: "Name, phone, course, date and timeSlot are required." });
+      }
+
+      const newBooking = await createBooking({
+        name,
+        phone,
+        email: email || "",
+        grade: grade || "General",
+        desiredCourse,
+        bookingDate,
+        timeSlot,
+        format: format || "ONLINE",
+        notes: notes || ""
+      });
+
+      // Tự động bắn thông báo tức thì Telegram + Gmail
+      sendTelegramBookingNotification(newBooking).catch(e => console.error("Telegram booking error:", e));
+
+      const formatText = format === 'ONLINE' ? '💻 Học Online qua Zoom' : '🏫 Học Trực tiếp tại Trung tâm';
+      const emailSubject = `📅 [LỊCH HẸN] Đặt lịch Đánh giá Năng lực từ ${name} (${bookingDate} ${timeSlot})`;
+      const emailHtml = `
+        <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #0f172a; color: #ffffff; border-radius: 12px;">
+          <h2 style="color: #f59e0b;">📅 LỊCH HẸN ĐÁNH GIÁ NĂNG LỰC 1-1 MỚI</h2>
+          <hr style="border-color: #334155;" />
+          <p><strong>👤 Phụ huynh/Học viên:</strong> ${name}</p>
+          <p><strong>📞 Số điện thoại:</strong> ${phone}</p>
+          <p><strong>📧 Email:</strong> ${email || 'Chưa cung cấp'}</p>
+          <p><strong>🏫 Khối lớp:</strong> ${grade || 'General'}</p>
+          <p><strong>📚 Khóa học quan tâm:</strong> ${desiredCourse}</p>
+          <p><strong>🗓 Ngày hẹn:</strong> ${bookingDate}</p>
+          <p><strong>⏰ Khung giờ:</strong> ${timeSlot}</p>
+          <p><strong>📍 Hình thức:</strong> ${formatText}</p>
+          <p><strong>📝 Ghi chú:</strong> ${notes || 'Không có'}</p>
+          <br />
+          <a href="https://zalo.me/${phone.replace(/[^0-9]/g, '')}" style="background-color: #2563eb; color: white; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;">👉 Chat Zalo Xác Nhận Lịch Hẹn</a>
+        </div>
+      `;
+      sendGmailNotification(emailSubject, emailHtml).catch(e => console.error("Gmail booking error:", e));
+
+      res.status(201).json({
+        success: true,
+        message: "Booking appointment scheduled successfully!",
+        booking: newBooking
+      });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // PATCH update booking status
+  app.patch("/api/bookings/:id", requireAuth(['ADMIN']), async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status, notes } = req.body;
+      const updated = await updateBookingStatus(id, status, notes);
+      if (!updated) {
+        return res.status(404).json({ success: false, error: "Booking not found." });
+      }
+      res.json({ success: true, booking: updated });
     } catch (err: any) {
       res.status(500).json({ success: false, error: err.message });
     }

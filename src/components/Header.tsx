@@ -29,6 +29,7 @@ interface HeaderProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   onOpenRegisterModal: (courseName?: string) => void;
+  onOpenBookingModal?: (courseName?: string) => void;
   isDarkMode: boolean;
   onToggleTheme: () => void;
 }
@@ -39,6 +40,7 @@ export const Header: React.FC<HeaderProps> = ({
   activeTab,
   setActiveTab,
   onOpenRegisterModal,
+  onOpenBookingModal,
   isDarkMode,
   onToggleTheme
 }) => {
@@ -98,7 +100,7 @@ export const Header: React.FC<HeaderProps> = ({
         <Sparkles className="w-3.5 h-3.5 animate-pulse text-amber-300" />
         <span>🔥 Trải nghiệm Lập trình & Trí Tuệ Nhân Tạo (AI) Miễn phí cho Học sinh Cấp 1, 2, 3!</span>
         <button 
-          onClick={() => onOpenRegisterModal("Đánh giá Năng lực & Học thử AI Miễn phí")} 
+          onClick={() => (onOpenBookingModal ? onOpenBookingModal("Đánh giá Năng lực & Học thử AI Miễn phí") : onOpenRegisterModal("Đánh giá Năng lực & Học thử AI Miễn phí"))} 
           className="underline hover:text-amber-200 ml-2 font-semibold cursor-pointer"
         >
           Đăng Ký Học Thử 1-1 &rarr;

@@ -14,6 +14,7 @@ import { LmsPortal } from './components/LmsPortal';
 import { AdminCrm } from './components/AdminCrm';
 import { Footer } from './components/Footer';
 import { RegistrationModal } from './components/RegistrationModal';
+import { BookingModal } from './components/BookingModal';
 import { LoginModal } from './components/LoginModal';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
@@ -22,6 +23,7 @@ const MainLayout: React.FC = () => {
   const [activeRole, setActiveRole] = useState<UserRole>('VISITOR');
   const [activeTab, setActiveTab] = useState<string>('home');
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState<boolean>(false);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState<boolean>(false);
   const [registerCourseName, setRegisterCourseName] = useState<string | undefined>(undefined);
 
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
@@ -53,6 +55,15 @@ const MainLayout: React.FC = () => {
     setRegisterCourseName(undefined);
   };
 
+  const handleOpenBookingModal = (courseName?: string) => {
+    setRegisterCourseName(courseName);
+    setIsBookingModalOpen(true);
+  };
+
+  const handleCloseBookingModal = () => {
+    setIsBookingModalOpen(false);
+  };
+
   const handleNavigateTab = (tab: string) => {
     setActiveTab(tab);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -81,6 +92,7 @@ const MainLayout: React.FC = () => {
         activeTab={activeTab}
         setActiveTab={handleNavigateTab}
         onOpenRegisterModal={handleOpenRegisterModal}
+        onOpenBookingModal={handleOpenBookingModal}
         isDarkMode={isDarkMode}
         onToggleTheme={handleToggleTheme}
       />
@@ -97,6 +109,7 @@ const MainLayout: React.FC = () => {
               <>
                 <Hero 
                   onOpenRegisterModal={handleOpenRegisterModal} 
+                  onOpenBookingModal={handleOpenBookingModal}
                   onNavigateRoadmap={() => handleNavigateTab('roadmap')} 
                 />
                 <WhyChooseUs onOpenRegisterModal={() => handleOpenRegisterModal()} />
@@ -152,6 +165,13 @@ const MainLayout: React.FC = () => {
         isOpen={isRegisterModalOpen}
         onClose={handleCloseRegisterModal}
         preselectedCourse={registerCourseName}
+      />
+
+      {/* Modal Đặt Lịch Đánh Giá Năng Lực 1-1 */}
+      <BookingModal
+        isOpen={isBookingModalOpen}
+        onClose={handleCloseBookingModal}
+        initialCourse={registerCourseName}
       />
 
       {/* Modal Đăng Nhập Đa Vai Trò (Admin & Học Viên) */}

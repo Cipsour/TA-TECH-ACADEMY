@@ -11,11 +11,13 @@ import {
 
 interface HeroProps {
   onOpenRegisterModal: (courseName?: string) => void;
+  onOpenBookingModal?: (courseName?: string) => void;
   onNavigateRoadmap: () => void;
 }
 
 export const Hero: React.FC<HeroProps> = ({
   onOpenRegisterModal,
+  onOpenBookingModal,
   onNavigateRoadmap
 }) => {
   return (
@@ -73,11 +75,19 @@ export const Hero: React.FC<HeroProps> = ({
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4">
               <button
-                onClick={() => onOpenRegisterModal()}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-bold text-sm shadow-xl shadow-blue-600/30 transition-all cursor-pointer transform active:scale-95"
+                onClick={() => (onOpenBookingModal ? onOpenBookingModal("Đánh giá Năng lực & Học thử AI Miễn phí") : onOpenRegisterModal())}
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-400 text-white font-extrabold text-sm shadow-xl shadow-amber-500/20 transition-all cursor-pointer transform active:scale-95"
               >
-                <span>Đăng Ký Học Thử Miễn Phí</span>
+                <Sparkles className="w-4 h-4 text-white" />
+                <span>Đặt Lịch Test Năng Lực 1-1</span>
                 <ArrowRight className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => onOpenRegisterModal()}
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm shadow-lg shadow-blue-600/30 transition-all cursor-pointer"
+              >
+                <span>Đăng Ký Học Thử</span>
               </button>
 
               <button
@@ -85,7 +95,7 @@ export const Hero: React.FC<HeroProps> = ({
                 className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-slate-600 hover:bg-slate-800 text-slate-200 font-semibold text-sm transition-all cursor-pointer"
               >
                 <MapPin className="w-4 h-4 text-cyan-400" />
-                <span>Xem Lộ Trình 72 Buổi</span>
+                <span>Xem Lộ Trình</span>
               </button>
             </div>
 

@@ -31,6 +31,22 @@ export interface Lead {
   updatedAt?: string;
 }
 
+export interface Booking {
+  id: string;
+  name: string;
+  phone: string;
+  email?: string;
+  grade?: string;
+  desiredCourse: string;
+  bookingDate: string; // YYYY-MM-DD
+  timeSlot: string;    // e.g. "09:00 - 10:30"
+  format: 'ONLINE' | 'OFFLINE';
+  notes?: string;
+  status: 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
+  createdAt: string;
+  updatedAt?: string;
+}
+
 const INITIAL_SEEDS: Lead[] = [
   {
     id: "lead-101",
@@ -74,6 +90,7 @@ const INITIAL_SEEDS: Lead[] = [
 const DATA_DIR = path.join(process.cwd(), 'data');
 const LEADS_FILE = path.join(DATA_DIR, 'leads.json');
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
+const BOOKINGS_FILE = path.join(DATA_DIR, 'bookings.json');
 
 /**
  * Băm mật khẩu bằng HMAC-SHA256 với Salt an toàn
@@ -434,4 +451,87 @@ export async function findUserById(id: string): Promise<User | null> {
 export async function getAllUsers(): Promise<Omit<User, 'passwordHash'>[]> {
   const users = await ensureUsersStorage();
   return users.map(({ passwordHash, ...safeUser }) => safeUser);
+}
+
+/**
+ * Đảm bảo file bookings.json luôn tồn tại
+ */
+async function ensureBookingsStorage(): Promise<Booking[]> {
+  try {
+    if (!fsSync.existsSync(DATA_DIR)) {
+      await fs.mkdir(DATA_DIR, { recursive: true });
+    }
+
+    if (!fsSync.existsSync(BOOKINGS_FILE)) {
+      await fs.writeFile(BOOKINGS_FILE, JSON.stringify([], null, 2), 'utf-8');
+      return [];
+    }
+
+    const content = await fs.readFile(BOOKINGS_FILE, 'utf-8');
+    if (!content.trim()) return [];
+    return JSON.parse(content);
+  } catch (err) {
+    console.error("Lỗi khi đọc file bookings.json:", err);
+    return [];
+  }
+}
+
+/**
+ * Ghi danh sách Bookings vào file an toàn
+ */
+async function saveBookingsToFile(bookings: Booking[]): Promise<void> {
+  if (!fsSync.existsSync(DATA_DIR)) {
+    await fs.mkdir(DATA_DIR, { recursive: true });
+  }
+  const tempFile = `${BOOKINGS_FILE}.tmp.${Date.now()}`;
+  await fs.writeFile(tempFile, JSON.stringify(bookings, null, 2), 'utf-8');
+  await fs.rename(tempFile, BOOKINGS_FILE);
+}
+
+/**
+ * Lấy toàn bộ danh sách Lịch hẹn Đánh giá Năng lực
+ */
+export async function getAllBookings(): Promise<Booking[]> {
+  return await ensureBookingsStorage();
+}
+
+/**
+ * Tạo lịch hẹn đánh giá năng lực mới
+ */
+export async function createBooking(data: Omit<Booking, 'id' | 'createdAt' | 'status'>): Promise<Booking> {
+  const newBooking: Booking = {
+    id: `book-${Date.now()}`,
+    name: data.name,
+    phone: data.phone,
+    email: data.email || '',
+    grade: data.grade || 'General',
+    desiredCourse: data.desiredCourse,
+    bookingDate: data.bookingDate,
+    timeSlot: data.timeSlot,
+    format: data.format || 'ONLINE',
+    notes: data.notes || '',
+    status: 'PENDING',
+    createdAt: new Date().toISOString()
+  };
+
+  const currentBookings = await ensureBookingsStorage();
+  currentBookings.unshift(newBooking);
+  await saveBookingsToFile(currentBookings);
+  return newBooking;
+}
+
+/**
+ * Cập nhật trạng thái Lịch hẹn
+ */
+export async function updateBookingStatus(id: string, status: Booking['status'], notes?: string): Promise<Booking | null> {
+  const currentBookings = await ensureBookingsStorage();
+  const index = currentBookings.findIndex(b => b.id === id);
+  if (index === -1) return null;
+
+  currentBookings[index].status = status;
+  if (notes !== undefined) currentBookings[index].notes = notes;
+  currentBookings[index].updatedAt = new Date().toISOString();
+
+  await saveBookingsToFile(currentBookings);
+  return currentBookings[index];
 }
