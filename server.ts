@@ -178,6 +178,48 @@ async function startServer() {
     }
   });
 
+// Helper function to send instant Telegram notification to Teacher's phone
+async function sendTelegramBotNotification(lead: any) {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+
+  if (!token || !chatId) {
+    console.log('[BOT NOTIFICATION] TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID not configured in .env');
+    return;
+  }
+
+  const text = `🔔 *THÔNG BÁO HỌC VIÊN ĐĂNG KÝ MỚI!*\n\n` +
+    `👤 *Họ tên:* ${lead.name}\n` +
+    `📞 *SĐT:* ${lead.phone}\n` +
+    `📧 *Email:* ${lead.email || 'Chưa cung cấp'}\n` +
+    `🏫 *Khối lớp:* ${lead.grade || 'Mọi độ tuổi'}\n` +
+    `📚 *Khóa học:* ${lead.desiredCourse}\n` +
+    `📝 *Ghi chú:* ${lead.notes || 'Không có'}\n` +
+    `⏱ *Thời gian:* ${new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })}\n\n` +
+    `👉 *Chat Zalo ngay với học viên:* https://zalo.me/${lead.phone.replace(/[^0-9]/g, '')}`;
+
+  try {
+    const telegramUrl = `https://api.telegram.org/bot${token}/sendMessage`;
+    const response = await fetch(telegramUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: text,
+        parse_mode: 'Markdown'
+      })
+    });
+    const result = await response.json();
+    if (result.ok) {
+      console.log(`[BOT NOTIFICATION SUCCESS] Sent lead alert for ${lead.name} (${lead.phone}) to Telegram.`);
+    } else {
+      console.error('[BOT NOTIFICATION FAILED]', result);
+    }
+  } catch (err: any) {
+    console.error('[BOT NOTIFICATION ERROR]', err.message);
+  }
+}
+
   // Create new lead (Public Registration Form - lưu trữ vĩnh viễn)
   app.post("/api/leads", async (req, res) => {
     try {
@@ -197,11 +239,14 @@ async function startServer() {
         source: source || 'FORM'
       });
 
+      // Tự động gửi tin nhắn báo về điện thoại Thầy ngay lập tức qua Telegram Bot
+      sendTelegramBotNotification(newLead).catch(e => console.error("Notification trigger error:", e));
+
       res.status(201).json({
         success: true,
         message: "Registration received successfully! Our academic advisor will contact you within 15 minutes.",
         lead: newLead,
-        zaloRedirectUrl: `https://zalo.me/0988888888?text=${encodeURIComponent(`Xin chào, tôi vừa đăng ký khóa học ${desiredCourse} cho học viên ${name} (SĐT: ${phone}).`)}`
+        zaloRedirectUrl: `https://zalo.me/0901315275?text=${encodeURIComponent(`Xin chào Thầy Tuấn Anh, tôi vừa đăng ký khóa học ${desiredCourse} cho học viên ${name} (SĐT: ${phone}).`)}`
       });
     } catch (err: any) {
       res.status(500).json({ success: false, error: err.message });

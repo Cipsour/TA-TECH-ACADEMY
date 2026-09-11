@@ -96,12 +96,12 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Top Banner Notice */}
       <div className="bg-gradient-to-r from-blue-700 via-indigo-600 to-cyan-600 text-xs py-1.5 px-4 text-center font-medium text-white flex items-center justify-center gap-2">
         <Sparkles className="w-3.5 h-3.5 animate-pulse text-amber-300" />
-        <span>Tuyển sinh Kỳ Hè: Đánh giá Năng lực AI Miễn phí & Ưu đãi 20% Học phí cho Học sinh Cấp 1, 2, 3!</span>
+        <span>🔥 Trải nghiệm Lập trình & Trí Tuệ Nhân Tạo (AI) Miễn phí cho Học sinh Cấp 1, 2, 3!</span>
         <button 
-          onClick={() => onOpenRegisterModal("Đánh giá Năng lực & Nhận Học bổng")} 
+          onClick={() => onOpenRegisterModal("Đánh giá Năng lực & Học thử AI Miễn phí")} 
           className="underline hover:text-amber-200 ml-2 font-semibold cursor-pointer"
         >
-          Nhận Ưu Đãi &rarr;
+          Đăng Ký Học Thử 1-1 &rarr;
         </button>
       </div>
 
